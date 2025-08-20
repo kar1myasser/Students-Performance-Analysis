@@ -59,6 +59,7 @@ Thumbs.db
 # *.csv
 # *.xlsx
 # *.json
+.md
 
 # Models (optional - uncomment if models are too large)
 # *.pkl
