@@ -19,13 +19,46 @@ This technical report presents a comprehensive machine learning analysis of stud
 ## Table of Contents
 
 1. [Project Overview](#1-project-overview)
+   - 1.1 [Problem Statement](#11-problem-statement)
+   - 1.2 [Objectives](#12-objectives)
+   - 1.3 [Dataset Description](#13-dataset-description)
+
 2. [Data Quality and Preprocessing](#2-data-quality-and-preprocessing)
+   - 2.1 [Data Quality Assessment](#21-data-quality-assessment)
+   - 2.2 [Data Type Optimization](#22-data-type-optimization)
+   - 2.3 [Feature Engineering](#23-feature-engineering)
+   - 2.4 [Outlier Analysis and Treatment](#24-outlier-analysis-and-treatment)
+
 3. [Exploratory Data Analysis](#3-exploratory-data-analysis)
+   - 3.1 [Target Variable Distribution](#31-target-variable-distribution)
+   - 3.2 [Feature Relationships](#32-feature-relationships)
+   - 3.3 [Visualization Insights](#33-visualization-insights)
+   - 3.4 [Statistical Hypothesis Testing](#34-statistical-hypothesis-testing)
+
 4. [Unsupervised Learning: Student Clustering](#4-unsupervised-learning-student-clustering)
+   - 4.1 [Data Encoding and Preprocessing for Clustering](#41-data-encoding-and-preprocessing-for-clustering)
+   - 4.2 [Feature Selection for Clustering](#42-feature-selection-for-clustering)
+   - 4.3 [Optimal Cluster Selection](#43-optimal-cluster-selection)
+   - 4.4 [Cluster Profiles](#44-cluster-profiles)
+   - 4.5 [Cluster Validation & Business Insights](#45-cluster-validation--business-insights)
+
 5. [Supervised Learning: Performance Prediction](#5-supervised-learning-performance-prediction)
+   - 5.1 [Data Encoding and Preprocessing](#51-data-encoding-and-preprocessing)
+   - 5.2 [Model Selection and Implementation](#52-model-selection-and-implementation)
+   - 5.3 [Hyperparameter Optimization](#53-hyperparameter-optimization)
+   - 5.4 [Model Training Strategy](#54-model-training-strategy)
+
 6. [Model Evaluation and Comparison](#6-model-evaluation-and-comparison)
+   - 6.1 [Performance Metrics](#61-performance-metrics)
+   - 6.2 [Model Performance Results](#62-model-performance-results)
+   - 6.3 [Key Findings](#63-key-findings)
+   - 6.4 [Feature Importance Analysis](#64-feature-importance-analysis)
+
 7. [Business Insights and Recommendations](#7-business-insights-and-recommendations)
-8. [Limitations and Future Work](#8-limitations-and-future-work)
+   - 7.1 [Educational Stakeholder Recommendations](#71-educational-stakeholder-recommendations)
+   - 7.2 [Policy Implications](#72-policy-implications)
+
+8. [Conclusion](#conclusion)
 
 ---
 
@@ -143,15 +176,11 @@ Statistical outlier detection revealed several extreme values, but domain expert
 
 ### 3.1 Target Variable Distribution
 
-```python
-pass_rate = df['pass_fail'].mean()
-print(f"Pass rate: {pass_rate:.1%}")
-print(f"Fail rate: {(1-pass_rate):.1%}")
-```
+![alt text](image-14.png)
 
 **Results**: 84.6% pass rate, 15.4% fail rate - shows significant class imbalance favoring the pass class. This imbalance will need to be addressed in the modeling approach through techniques like class weighting, resampling, or adjusted threshold selection.
 
-**Gradea Distributions:**
+**Grades Distributions:**
 
 
 ![alt text](image.png)
@@ -168,12 +197,6 @@ Key correlations with academic performance:
 
 **Critical Finding**: G1 and G2 grades show strong correlation with G3 (final exam grade), creating potential data leakage scenarios:
 
-```python
-print("Correlations with G3 (Final Exam):")
-print(f"G1: {df['G1'].corr(df['G3']):.3f}")
-print(f"G2: {df['G2'].corr(df['G3']):.3f}")
-```
-
 **Results**: G1-G3: r=0.826, G2-G3: r=0.918
 
 **Temporal Logic**: G1 (1st period) → G2 (2nd period) → G3 (final exam)
@@ -183,7 +206,7 @@ print(f"G2: {df['G2'].corr(df['G3']):.3f}")
 2. **Without G1 & G2**: Represents early intervention scenario (beginning of academic year)
 
 **Key Predictive Variables (Non-Leakage):**
-![alt text](image-2.png)
+![alt text](image-15.png)
 
 
 - `failures`: -0.393 (strongest non-leakage predictor)
@@ -196,7 +219,51 @@ print(f"G2: {df['G2'].corr(df['G3']):.3f}")
 
 ---
 
-### 3.6 Statistical Hypothesis Testing
+### 3.3 Visualization Insights
+
+**Key Categorical Analysis:**
+Based on the visualizations from `02_eda_visualization.ipynb`, the following relationships emerge:
+
+---
+![alt text](image-16.png)
+
+**Finding**: Students with 0 previous failures show median G3 scores of 12, while students with 3+ failures show median score of 8. Clear downward trend demonstrates that past academic struggles are strong predictors of future performance.
+
+---
+
+![alt text](image-17.png)
+
+**Finding**: Students studying >5 hours weekly (levels 3-4) show slightly higher median G3 scores (13) compared to those studying <5 hours (levels 1-2) with median scores around 11-12. ANOVA confirms statistical significance (p<0.001).
+
+---
+
+![alt text](image-18.png)
+
+**Finding**: Students receiving school support show lower median G3 scores (11) compared to non-recipients (12), indicating support is targeted toward struggling students. This creates selection bias in the data where support correlates with lower performance.
+
+---
+![alt text](image-19.png)
+
+**Finding**: Clear positive correlation between parental education levels and student performance. Students with highly educated mothers (level 4) show median G3 scores of 13, while those with less educated mothers (levels 0-2) show median scores around 11-12.
+
+---
+
+![alt text](image-20.png)
+
+**Finding**: Absences show a weak negative correlation with final grades (r = -0.091, p = 0.020). Despite the weak correlation, this scatter plot reveals important behavioral patterns - students with high absence rates (>20 absences) tend to cluster at lower grade levels, making absences a valuable variable for behavioral clustering despite limited predictive power for individual grade prediction.
+
+---
+
+**Key Visual Findings from Actual EDA Analysis:**
+- **Past Failures Impact**: Clear negative correlation between previous failures and current performance
+- **Study Time Benefits**: Students with higher weekly study commitments show improved grade distributions
+- **Support System Effects**: School support recipients show different performance patterns (selection bias evident)
+- **Educational Background**: Maternal and paternal education levels correlate with student achievement patterns
+- **Attendance Patterns**: Absences demonstrate weak but significant correlation with performance, revealing behavioral clustering opportunities
+
+---
+
+### 3.4 Statistical Hypothesis Testing
 
 We conducted formal hypothesis testing to validate key relationships identified during exploratory data analysis. All tests used α = 0.05 significance level.
 
@@ -273,63 +340,92 @@ We conducted formal hypothesis testing to validate key relationships identified 
 
 **Statistical Validation**: All four hypotheses provide robust statistical validation for our modeling approach, confirming that both behavioral variables (study time, absences) and institutional factors (past failures, school support) significantly influence academic outcomes.
 
-#### Statistical Conclusions Summary
-
-| Hypothesis | Test | p-value | Effect Size | Conclusion |
-|------------|------|---------|-------------|------------|
-| Study Time → Performance | ANOVA | <0.001 | η² = 0.069 (medium) | **Significant** |
-| Past Failures → Pass/Fail | Chi-square | <0.001 | V = 0.403 (large) | **Significant** |
-| Maternal Education → Success | Chi-square trend | <0.001 | V = 0.210 (medium) | **Significant** |
-| School Type → Performance | Mann-Whitney | <0.001 | η² = 0.081 (medium) | **Significant** |
-
-**Key Findings**:
-1. **Study behavior significantly impacts outcomes** - Students must commit >5 hours/week for optimal performance
-2. **Past failures are the strongest predictor** - Previous academic struggles create compounding risk
-3. **Family educational background matters** - Maternal education shows clear intergenerational effects  
-4. **Institutional factors influence performance** - School choice affects student outcomes beyond individual characteristics
-
-**Statistical Validation**: All four hypotheses provide robust statistical validation for our modeling approach, confirming that both behavioral variables (study time, past failures) and demographic factors (parental education, school type) significantly influence academic outcomes.
-
-### 3.4 Visualization Insights
-
-**Key Categorical Analysis:**
-Based on the visualizations from `02_eda_visualization.ipynb`, the following relationships emerge:
-
----
-![alt text](image-3.png)
-
-**Finding**: Students with 0 previous failures show median G3 scores of 12, while students with 3+ failures show median score of 8. Clear downward trend demonstrates that past academic struggles are strong predictors of future performance.
-
----
-
-![alt text](image-4.png)
-
-**Finding**: Students studying >5 hours weekly (levels 3-4) show slightly higher median G3 scores (13) compared to those studying <5 hours (levels 1-2) with median scores around 11-12. ANOVA confirms statistical significance (p<0.001).
-
----
-
-![alt text](image-5.png)
-
-**Finding**: Students receiving school support show lower median G3 scores (11) compared to non-recipients (12), indicating support is targeted toward struggling students. This creates selection bias in the data where support correlates with lower performance.
-
----
-![alt text](image-6.png)
-
-**Finding**: Clear positive correlation between parental education levels and student performance. Students with highly educated mothers (level 4) show median G3 scores of 13, while those with less educated mothers (levels 0-2) show median scores around 11-12.
-
----
-
-**Key Visual Findings from Actual EDA Analysis:**
-- **Past Failures Impact**: Clear negative correlation between previous failures and current performance
-- **Study Time Benefits**: Students with higher weekly study commitments show improved grade distributions
-- **Support System Effects**: School support recipients show different performance patterns (selection bias evident)
-- **Educational Background**: Maternal and paternal education levels correlate with student achievement patterns
-
 ---
 
 ## 4. Unsupervised Learning: Student Clustering
 
-### 4.1 Feature Selection for Clustering
+### 4.1 Data Encoding and Preprocessing for Clustering
+
+Before implementing K-means clustering, we performed targeted data encoding focused specifically on behavioral features to avoid bias from academic performance indicators. Our encoding strategy prioritized interpretability and maintained the behavioral focus of the clustering analysis.
+
+#### 4.1.1 Feature Selection Strategy
+
+We selected 6 behavioral features that capture student behavior patterns independent of academic outcomes:
+
+```python
+# Behavioral features for clustering analysis
+behavior_features = ['studytime', 'absences', 'goout', 'freetime', 'famsup', 'schoolsup']
+clustering_data = df[behavior_features].copy()
+```
+
+**Rationale**: These features represent pure behavioral indicators (study habits, social activities, support systems) without academic performance bias, enabling genuine behavioral pattern discovery.
+
+#### 4.1.2 Boolean to Binary Encoding
+
+Support system variables were converted from boolean to binary format:
+
+```python
+# Convert boolean support variables to binary (0/1)
+clustering_data['famsup'] = clustering_data['famsup'].astype(int)    # True/False -> 1/0
+clustering_data['schoolsup'] = clustering_data['schoolsup'].astype(int)  # True/False -> 1/0
+```
+
+**Impact**: Family support (famsup) and school support (schoolsup) variables transformed from boolean to numeric format suitable for distance calculations in K-means clustering.
+
+#### 4.1.3 Feature Standardization
+
+All features were standardized using StandardScaler to ensure equal contribution to clustering:
+
+```python
+# Standardize all behavioral features
+scaler = StandardScaler()
+features_scaled = scaler.fit_transform(clustering_data[behavior_features])
+
+# Create final clustering dataframe with standardized features
+clustering_df = pd.DataFrame(features_scaled, columns=behavior_features, 
+                           index=clustering_data.index)
+```
+
+**Standardization Results:**
+- **Mean**: 0.0 for all features
+- **Standard Deviation**: 1.0 for all features
+- **Equal Weight**: Prevents features with larger scales (e.g., absences: 0-93) from dominating smaller scales (e.g., studytime: 1-4)
+
+#### 4.1.4 Final Clustering Dataset Characteristics
+
+**Original Feature Scales:**
+- `studytime`: 1-4 (ordinal: <2h to >10h weekly)
+- `absences`: 0-93 (count: number of school absences)
+- `goout`: 1-5 (ordinal: social activity frequency)
+- `freetime`: 1-5 (ordinal: after-school free time)
+- `famsup`: 0/1 (binary: family educational support)
+- `schoolsup`: 0/1 (binary: extra school support)
+
+**After Preprocessing:**
+- **Shape**: 649 students × 6 behavioral features
+- **All features standardized** with mean=0, std=1
+- **Distance-ready format** for K-means clustering
+- **No academic performance bias** in feature selection
+
+#### 4.1.5 Preprocessing Validation
+
+The standardized features maintain interpretable relationships while enabling effective clustering:
+
+```python
+print("Final clustering dataset:")
+print(clustering_df.head())
+print(f"Shape: {clustering_df.shape}")
+print(f"Feature summary:")
+print(clustering_df[behavior_features].describe())
+```
+
+**Quality Assurance:**
+- All features properly standardized (mean ≈ 0, std ≈ 1)
+- No missing values after encoding
+- Behavioral focus maintained throughout preprocessing
+- Ready for unsupervised learning algorithms
+
+### 4.2 Feature Selection for Clustering
 
 We selected 6 behavioral features for K-means clustering:
 
@@ -339,7 +435,7 @@ behavioral_features = ['studytime', 'absences', 'goout', 'freetime', 'famsup', '
 
 **Rationale**: These features capture student behavior patterns independent of academic outcomes, enabling pure behavioral segmentation.
 
-### 4.2 Optimal Cluster Selection
+### 4.3 Optimal Cluster Selection
 
 **Elbow Method Results:**
 The elbow method analysis from `03_unsupervised_learning.ipynb` demonstrates the optimal number of clusters:
@@ -361,7 +457,16 @@ The silhouette analysis complements the elbow method findings:
 **Decision**: K=4 provides optimal balance between cluster separation and educational actionability. The moderate silhouette score (0.243) indicates behavioral features show natural grouping patterns suitable for intervention strategies.
 
 ----
-### 4.3 Cluster Profiles
+### 4.4 Cluster Profiles
+
+![alt text](image-13.png)
+
+**Visual Insights from Cluster Analysis:**
+- **Clear Separation**: Clusters show distinct behavioral patterns in study time vs absences space
+- **Academic Correlation**: Higher-performing clusters demonstrate better study habits and lower absence rates
+- **Intervention Targets**: Cluster 0 shows clear risk factors requiring immediate attention (lowest pass rate at 76.7%)
+- **Uneven Distribution**: Cluster sizes range from 10.5% to 37%, with Cluster 1 (high achievers) being the largest group
+
 
 ## Cluster 0: "The Social Strugglers" (20.5% of students)
 **Academic Performance:** Lowest performing group
@@ -424,7 +529,7 @@ The silhouette analysis complements the elbow method findings:
 ---
 
 
-#### 4.4 Cluster Validation & Business Insights
+#### 4.5 Cluster Validation & Business Insights
 
 **Statistical Significance**: ANOVA F-test confirmed significant differences in academic performance across clusters (p < 0.001).
 
@@ -459,8 +564,6 @@ All behavioral features show statistically significant differences between clust
 - schoolsup: F=∞, p<0.001
 
 ---
-**[INSERT PLOT: Student Behavioral Clusters - Scatter Plot and Analysis]**
-*Figure 4.3: Multi-panel visualization showing cluster distributions across behavioral features, academic performance, and demographic factors*
 
 ---
 
@@ -474,7 +577,107 @@ All behavioral features show statistically significant differences between clust
 
 ## 5. Supervised Learning: Performance Prediction
 
-### 5.1 Model Selection and Implementation
+### 5.1 Data Encoding and Preprocessing
+
+Before implementing classification algorithms, we performed comprehensive data encoding to convert categorical variables into numerical formats suitable for machine learning models. Our encoding strategy was designed to preserve meaningful relationships while avoiding information loss.
+
+#### 5.1.1 Ordinal Variable Encoding
+
+For variables with natural ordering, we used categorical codes to maintain the ordinal relationships:
+
+```python
+# Ordinal variables - preserve natural ordering
+ordinal_vars = ['Medu', 'Fedu', 'traveltime', 'studytime', 'famrel', 
+                'freetime', 'goout', 'Dalc', 'Walc', 'health']
+
+for var in ordinal_vars:
+    if var in df_encoded.columns:
+        df_encoded[var] = df_encoded[var].cat.codes  # Converts to 0,1,2,3,4 maintaining order
+```
+
+**Rationale**: Education levels (Medu, Fedu), time scales (traveltime, studytime), and quality ratings (famrel, health) have inherent ordering that should be preserved in the encoding.
+
+#### 5.1.2 Binary Variable Encoding
+
+Boolean variables were converted to binary (0/1) encoding:
+
+```python
+# Binary variables - convert True/False to 1/0
+binary_vars = ['schoolsup', 'famsup', 'paid', 'activities', 
+               'nursery', 'higher', 'internet', 'romantic']
+
+for var in binary_vars:
+    if var in df_encoded.columns:
+        df_encoded[var] = df_encoded[var].astype(int)  # True->1, False->0
+```
+
+**Rationale**: Support services and background factors are naturally binary, making 0/1 encoding optimal for model interpretation.
+
+#### 5.1.3 Nominal Categorical Encoding
+
+For nominal categories, we applied different strategies based on cardinality:
+
+**Binary Mapping (2-level categories):**
+```python
+# Binary mappings for 2-level categoricals
+binary_mappings = {
+    'school': {'GP': 1, 'MS': 0},
+    'sex': {'F': 1, 'M': 0}, 
+    'address': {'U': 1, 'R': 0},
+    'famsize': {'GT3': 1, 'LE3': 0},
+    'Pstatus': {'T': 1, 'A': 0}
+}
+
+for col, mapping in binary_mappings.items():
+    if col in df_encoded.columns:
+        df_encoded[col] = df_encoded[col].map(mapping)
+```
+
+**One-Hot Encoding (Multi-level categories):**
+```python
+# Multi-level categorical columns
+categorical_cols = ['Mjob', 'Fjob', 'reason', 'guardian']
+
+# One-hot encode with drop_first=True to avoid multicollinearity
+df_encoded = pd.get_dummies(df_encoded, columns=categorical_cols, drop_first=True)
+```
+
+**Rationale**: Binary mapping for 2-level categories reduces dimensionality while one-hot encoding for multi-level categories (parent jobs, school choice reason) prevents false ordinal relationships.
+
+#### 5.1.4 Feature Scaling
+
+All encoded features were standardized using StandardScaler:
+
+```python
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+```
+
+**Final Encoding Results:**
+- **Original shape**: 649 × 33 features
+- **Encoded shape**: 649 × 48 features (after one-hot encoding expansion)
+- **All features standardized** with mean=0, std=1
+- **No information loss** through appropriate encoding choices
+
+#### 5.1.5 Feature Set Creation
+
+We created two distinct feature sets to address data leakage concerns:
+
+```python
+# Set 1: WITH G1 & G2 (mid-term prediction scenario)
+X_with_grades = X.copy()
+
+# Set 2: WITHOUT G1 & G2 (early intervention scenario)  
+grade_columns = ['G1', 'G2']
+X_without_grades = X.drop(columns=grade_columns)
+```
+
+**Strategic Purpose:**
+- **With G1/G2**: Represents mid-term prediction after 1st/2nd period grades available
+- **Without G1/G2**: Represents early intervention at beginning of academic year
+
+### 5.2 Model Selection and Implementation
 
 We implemented 6 different classification algorithms with both base and hyperparameter-tuned versions using individual function implementations:
 
@@ -492,7 +695,7 @@ def svm_base(X_train, X_test, title)
 def svm_tuned(X_train, X_test, title)
 ```
 
-### 5.2 Hyperparameter Optimization
+### 5.3 Hyperparameter Optimization
 
 **GridSearchCV/RandomizedSearchCV Parameters:**
 
@@ -552,7 +755,7 @@ param_dist_svm = {
 }
 ```
 
-### 5.3 Model Training Strategy
+### 5.4 Model Training Strategy
 
 **Data Splitting:**
 ```python

@@ -13,12 +13,32 @@ This project analyzes student performance data from the UCI ML Repository to ide
 ## Project Structure
 ```
 ├── data/
-│   └── raw/                    # Original dataset (student_performance.csv)
-├── notebooks/                  # Jupyter notebooks for analysis (5 notebooks)
-├── reports/                    # Technical report and figures
-├── presentation/               # Final presentation materials
-├── requirements.txt            # Python dependencies
-└── README.md                   # This file
+│   ├── raw/                    # Original dataset files
+│   └── processed/              # Cleaned and processed datasets
+├── notebooks/                  # Jupyter notebooks for analysis (4 notebooks)
+│   ├── 01_data_preparation.ipynb       # Data cleaning and preprocessing
+│   ├── 02_eda_visualization.ipynb      # Exploratory data analysis  
+│   ├── 03_unsupervised_learning.ipynb  # K-means clustering analysis
+│   └── 04_supervised_learning.ipynb    # Classification model training
+├── reports/                    # Technical reports and visualizations
+│   ├── data_quality_report.md          # Data quality assessment
+│   ├── technical_report.md             # Comprehensive technical report
+│   ├── *.pdf                          # PDF versions of reports
+│   └── *.png                          # Generated visualizations
+├── src/                        # Source code modules
+│   ├── data_processing.py              # Data processing utilities
+│   ├── model_utils.py                  # Model training utilities
+│   ├── visualization.py               # Visualization functions
+│   └── __init__.py                     # Package initialization
+├── screenshots/                # Project screenshots and images
+├── .vscode/                   # VS Code configuration
+├── .gitignore                 # Git ignore rules
+├── COPILOT_GUIDELINES.md      # Development guidelines
+├── download_dataset.py        # Dataset download script
+├── environment.yml            # Conda environment configuration
+├── project_requirements.md    # Project requirements document
+├── requirements.txt           # Python dependencies
+└── README.md                  # This file
 ```
 
 ## Setup Instructions
@@ -41,19 +61,7 @@ pip install -r requirements.txt
 - Technical Report with Insights and Recommendations
 - Presentation Slides
 
-## Assignment Requirements Met
-✅ Data Preparation & Quality Report
-✅ Data Transformation & Feature Engineering  
-✅ Exploratory Data Analysis (EDA)
-✅ Required Visualizations (histograms, boxplots, scatter plots, heatmaps)
-✅ Unsupervised Learning (K-Means clustering)
-✅ Supervised Learning (multiple classification algorithms)
-✅ Model Evaluation & Comparison
-✅ Actionable Insights & Recommendations
-✅ Ethical Considerations
 
 ## Authors
-[Your Name]
+Karim Yasser
 
-## License
-This project is licensed under the MIT License.
